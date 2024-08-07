@@ -27,6 +27,12 @@ def lscore(xx):
             if kk.find(' '):
                kk = '_'.join(kk.split())
             return kk
+
+def nstr(xx):
+    if xx == None:
+        return ''
+    else:
+        return str(xx)
     
 class Record(Request):
     def __init__(self,id,record_dict,table,shadow):
