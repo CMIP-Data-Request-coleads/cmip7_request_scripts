@@ -106,7 +106,7 @@ def import_request():
   b = Base()
   for n,tt in rr.lb.tables.items():
       shadow = n[0] == '_'
-      t = Table(n,tt[-1],shadow=shadow)
+      t = Table(n,tt['records'],shadow=shadow)
       if not shadow:
         nn = lscore(n)
         assert nn not in b.__dict__

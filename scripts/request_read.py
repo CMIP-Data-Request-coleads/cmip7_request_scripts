@@ -16,14 +16,22 @@ keyr = 'patp4zreu20JB67zA.c7ae87c7aec8f34081b5773ea936f738eb8b10bf0493a171096064
 ##  vars = base['Data Request Variables (Public)']['table']['Variables']['records']
 ##
 ##
-FROMBASE = True
 FROMBASE = False
+FROMBASE = True
+
+def nstr(xx):
+    if xx == None:
+        return ''
+    else:
+        return str(xx)
+
 
 class LoadBase(object):
     """ LoadBase loads bases from air-table into a dictionary object.
     """
     def __init__(self,api):
         self.tables = dict()
+        self.table_objs = dict()
         self._tables = dict()
         self.api = api
         self.shadow_table_names = ['tblQcdKgPGU0jFq1b','tbl7L210y9LFpFI7b']
@@ -34,6 +42,7 @@ class LoadBase(object):
       for t in base.tables():
          print ( 'Reading ',x.name,t.name )
          r_list = dict()
+         s=t.schema()
          for record in t.all():
              r_list[record['id']] = record['fields'] 
          if t.id in self.shadow_table_names:
@@ -43,7 +52,8 @@ class LoadBase(object):
          else:
              shadow = False
              this_name = t.name
-         self.tables[this_name] = (t.id, t.name, x.id, x.name, r_list)
+         self.tables[this_name] = dict(id=t.id, name=t.name, description=nstr(s.description), base_id=x.id, base_name=x.name, records=r_list)
+         self.table_objs[this_name] = t
 
 class ReloadBase(object):
     def __init__(self):
