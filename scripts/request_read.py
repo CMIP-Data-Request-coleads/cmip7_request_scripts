@@ -17,6 +17,7 @@ keyr = 'patp4zreu20JB67zA.c7ae87c7aec8f34081b5773ea936f738eb8b10bf0493a171096064
 ##
 ##
 FROMBASE = True
+FROMBASE = False
 
 class LoadBase(object):
     """ LoadBase loads bases from air-table into a dictionary object.
@@ -35,11 +36,22 @@ class LoadBase(object):
          r_list = dict()
          for record in t.all():
              r_list[record['id']] = record['fields'] 
-         if t.id not in self.shadow_table_names:
-           self.tables[t.name] = (t.id, t.name, x.id, x.name, r_list)
+         if t.id in self.shadow_table_names:
+             this_name = '__%s__' % t.name
+             shadow = True
+             print ( 'Shadow ',x.name,t.name )
          else:
-           self._tables[t.name] = (t.id, t.name, x.id, x.name, r_list)
-           print ( 'Shadow ',x.name,t.name )
+             shadow = False
+             this_name = t.name
+         self.tables[this_name] = (t.id, t.name, x.id, x.name, r_list)
+
+class ReloadBase(object):
+    def __init__(self):
+        pass
+
+    def load(self,filename):
+      j = open( filename, 'r' )
+      self.tables = json.load( j )
 
 def from_base():
   api = Api(keyr)
@@ -53,15 +65,15 @@ def from_base():
   j.close()
   return lb
 
-
 def load_json():
-  j = open( 'request_basic_dump2.json', 'r' )
-  tables = json.load( j )
-  return tables
-
+  lb = ReloadBase()
+  lb.load('request_basic_dump2.json')
+  return lb
+  
 
 if FROMBASE:
     lb = from_base()
-    tables = lb.tables
 else:
-    tables = load_json()
+    lb = load_json()
+
+tables = lb.tables

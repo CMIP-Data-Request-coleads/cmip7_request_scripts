@@ -19,6 +19,8 @@ def implement():
             i0,i1 = list(i)
             Request.rmap[i0.id] = i1.id
             Request.rmap[i1.id] = i0.id
+    for k,i in Request.records.items():
+        i.__implement__()
 
 def lscore(xx):
             kk = xx.lower()
@@ -27,8 +29,9 @@ def lscore(xx):
             return kk
     
 class Record(Request):
-    def __init__(self,id,record_dict,shadow):
+    def __init__(self,id,record_dict,table,shadow):
         self.index = set(['id',])
+        self.__table__ = table
         for k,i in record_dict.items():
             kk = lscore(k)
             assert kk not in self.__dict__
@@ -51,6 +54,7 @@ class Record(Request):
 
     def __implement__(self):
         for kk in self.index:
+          if kk != 'id':
             this = self.__dict__[kk]
             if type( this ) == type('') and this in self.records:
                 self.__dict__[kk] = self.records[this]
@@ -71,9 +75,10 @@ class Table(Request):
     def __init__(self,name,records,shadow=False):
         self.record_list = []
         self.name_dict = dict()
+        self.name = name
         Request.tables[name] = self
         for k,r in records.items():
-          rec = Record(k,r,shadow)
+          rec = Record(k,r,self,shadow)
           self.record_list.append( rec )
           if 'name' in rec.index:
               n = rec.name
@@ -83,7 +88,12 @@ class Table(Request):
               n = None
           if n != None:
             self.name_dict[n] = rec
-            self.record_by_name[n].add(rec)
+            ##
+            ## MESSY TEMPRORARY FIX TO GET MAPPING OF SYNCED RECORDS WORKING
+            ## BY AVOIDING NAME DUPLICATION IN THIS TABLE
+            ##
+            if name != 'ESM-BCV 1.3':
+              self.record_by_name[n].add(rec)
 
 
     def by_name(self,name):
@@ -95,11 +105,13 @@ def import_request():
   import request_read as rr
   b = Base()
   for n,tt in rr.lb.tables.items():
-      t = Table(n,tt[-1])
-      nn = lscore(n)
-      assert nn not in b.__dict__
-      b.__dict__[nn] = t
-  for n,tt in rr.lb._tables.items():
-      t = Table(n,tt[-1],shadow=True)
+      shadow = n[0] == '_'
+      t = Table(n,tt[-1],shadow=shadow)
+      if not shadow:
+        nn = lscore(n)
+        assert nn not in b.__dict__
+        b.__dict__[nn] = t
+  ##for n,tt in rr.lb._tables.items():
+      ##t = Table(n,tt[-1],shadow=True)
   implement()
   return b
