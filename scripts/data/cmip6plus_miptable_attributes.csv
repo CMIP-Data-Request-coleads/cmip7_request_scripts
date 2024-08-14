@@ -1,0 +1,18 @@
+cell_measures	string	required	May be empty
+cell_methods	string	required	Empty for depricated ugrido
+comment	string	required	
+dimensions	list	required	
+flag_meanings	string		Provided for one variable only
+flag_values	string		Provided for one variable only
+frequency	string	required	
+long_name	string	required	
+modeling_realm	list	required	
+ok_max_mean_abs	string	required	Always empty
+ok_min_mean_abs	string	required	Always empty
+out_name	string	required	
+positive	string	required	May be empty
+standard_name	string	required	
+type	string	required	
+units	string	required	Empty for depricated ugrido
+valid_max	string	required	Always empty
+valid_min	string	required	Always empty
