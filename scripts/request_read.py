@@ -2,8 +2,6 @@ import os
 import json
 from pyairtable import Api
 
-## This is a read-only key for the 3 public CMIP7 Fast Track Bases
-keyr = 'patp4zreu20JB67zA.c7ae87c7aec8f34081b5773ea936f738eb8b10bf0493a171096064ab9ce163d5'
 
 ## Initial Structure [[ not exactly what is implemented below ]]
 ##
@@ -34,6 +32,8 @@ class LoadBase(object):
         self.table_objs = dict()
         self._tables = dict()
         self.api = api
+        ## shadow_table_names is used to identify synced tables so that mappings from one base to another can be tracked.
+        ## manually copied for air table.
         self.shadow_table_names = ['tblQcdKgPGU0jFq1b','tbl7L210y9LFpFI7b']
 
     def load(self,x):
@@ -53,6 +53,7 @@ class LoadBase(object):
              shadow = False
              this_name = t.name
          self.tables[this_name] = dict(id=t.id, name=t.name, description=nstr(s.description), base_id=x.id, base_name=x.name, records=r_list)
+
          self.table_objs[this_name] = t
 
 class ReloadBase(object):
@@ -64,6 +65,10 @@ class ReloadBase(object):
       self.tables = json.load( j )
 
 def from_base():
+## This is a read-only key for the 3 public CMIP7 Fast Track Bases
+## keys are private. If you have a user account, see https://airtable.com/create/tokens
+  keyr = open( '/home/mjuckes/Repositories/airtable_read_key' ).readlines()[0].strip()
+
   api = Api(keyr)
   lb = LoadBase(api)
 
@@ -81,9 +86,11 @@ def load_json():
   return lb
   
 
-if FROMBASE:
+if __name__ == "__main__":
+
+  if FROMBASE:
     lb = from_base()
-else:
+  else:
     lb = load_json()
 
-tables = lb.tables
+  tables = lb.tables
