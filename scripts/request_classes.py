@@ -3,8 +3,8 @@ import collections
 
 class Request(object):
     software_version = '0.1.0'
-    records = dict()
-    tables = dict()
+    all_records = dict()
+    all_tables = dict()
     record_by_uid = collections.defaultdict( set )
     record_by_name = collections.defaultdict( set )
     rmap = dict()
@@ -19,7 +19,7 @@ def implement():
             i0,i1 = list(i)
             Request.rmap[i0.id] = i1.id
             Request.rmap[i1.id] = i0.id
-    for k,i in Request.records.items():
+    for k,i in Request.all_records.items():
         i.__implement__()
 
 def lscore(xx):
@@ -45,7 +45,7 @@ class Record(Request):
             self.index.add(kk)
         self.id = id
         if not shadow:
-          self.records[self.id] = self
+          self.all_records[self.id] = self
         if 'uid' in self.index:
             self.record_by_uid[self.uid].add(self)
 
@@ -62,15 +62,15 @@ class Record(Request):
         for kk in self.index:
           if kk != 'id':
             this = self.__dict__[kk]
-            if type( this ) == type('') and this in self.records:
-                self.__dict__[kk] = self.records[this]
+            if type( this ) == type('') and this in self.all_records:
+                self.__dict__[kk] = self.all_records[this]
             elif type( this ) in [type( () ), type( [] )] and all( [type(x) == type('') for x in this] ):
                 that = []
                 for x in this:
-                    if x in self.records:
-                        that.append( self.records[x] )
+                    if x in self.all_records:
+                        that.append( self.all_records[x] )
                     elif x in self.rmap:
-                        that.append( self.records[self.rmap[x]] )
+                        that.append( self.all_records[self.rmap[x]] )
                     else:
                         that.append( x)
                 self.__dict__[kk] = tuple(that)
@@ -82,7 +82,7 @@ class Table(Request):
         self.record_list = []
         self.name_dict = dict()
         self.name = name
-        Request.tables[name] = self
+        Request.all_tables[name] = self
         for k,r in records.items():
           rec = Record(k,r,self,shadow)
           self.record_list.append( rec )
@@ -98,7 +98,7 @@ class Table(Request):
             ## MESSY TEMPRORARY FIX TO GET MAPPING OF SYNCED RECORDS WORKING
             ## BY AVOIDING NAME DUPLICATION IN THIS TABLE
             ##
-            if name != 'ESM-BCV 1.3':
+            if name not in ['ESM-BCV 1.3','Grids']:
               self.record_by_name[n].add(rec)
 
 
@@ -109,8 +109,9 @@ class Table(Request):
 
 def import_request():
   import request_read as rr
+  lb = rr.load_json()
   b = Base()
-  for n,tt in rr.lb.tables.items():
+  for n,tt in lb.tables.items():
       shadow = n[0] == '_'
       t = Table(n,tt['records'],shadow=shadow)
       if not shadow:
