@@ -1,10 +1,8 @@
-
 import json
 import request_read
 import request_classes
 import collections
 from datetime import datetime
-
 
 lb = request_read.load_json()
 dr = request_classes.import_request()
@@ -13,7 +11,7 @@ class CMOR_Variable(object):
     __fails__ = []
     def __init__(self,record):
         self.d = record.__dict__
-        self.o = dict()
+        self.o = dict( valid_max="", valid_min="", ok_max_mean_abs="", ok_min_mean_abs="")
         self.vid = self.d.get('compound_name','')
         self.status = self.d.get('status','')
         self._rv = 0
@@ -171,7 +169,7 @@ Header= {
     "approx_interval": 30.0,
     "checksum": "",
     "cmor_version": "3.8.0",
-    "data_specs_version": "1.0a1",
+    "data_specs_version": "1.0a2",
     "generic_levels": "",
     "int_missing_value": "-999",
     "missing_value": "1e20",
