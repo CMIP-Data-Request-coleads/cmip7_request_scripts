@@ -3,6 +3,8 @@ import json
 import request_read
 import request_classes
 import collections
+from datetime import datetime
+
 
 lb = request_read.load_json()
 dr = request_classes.import_request()
@@ -26,9 +28,44 @@ class CMOR_Variable(object):
             self.get_cell_measures()
             self.get_misc()
             self.get_comment()
+            self.get_dimensions()
             self.get_title()
             self._rv = 1
         print( self.vid, self.status, self.o )
+
+    def get_dimensions(self):
+        try:
+          a = self.d.get('spatial_shape','')
+          b = self.d.get('temporal_shape','')
+          c = self.d.get('extra_dimensions','')
+          d = self.d.get('coordinates','')
+        except:
+          print( self.vid,'FAILED to get linked records for dimensions' )
+          print( self.d.keys() )
+          self._rv = 0
+
+        this = []
+        if a != '':
+            for x in a[0].__dict__.get( 'dimensions', [] ):
+                this.append( x.name )
+
+        if b != '':
+            for x in b[0].__dict__.get( 'dimensions', [] ):
+                this.append( x.name )
+
+##
+## as of 3rd Sep. the public view of the extra dimensions and coordinates columns are text fields rather than links to grids records.
+## 
+        if c != '':
+            for x in c.split(', '):
+                this.append( x )
+
+        if d != '':
+            for x in d.split(', '):
+                this.append( x )
+
+        self.o['dimensions'] = this
+
 
     def MIP_table_dict(self):
         return {k:self.o[k] for k in self.o.keys() - {'table',}}
@@ -104,17 +141,6 @@ class CMOR_Variable(object):
           self.o[this] = x
         self.table = self.o['table']
 
-    def get_title(self):
-        try:
-          x = self.d.get('title','')
-        except:
-          print( 'FAILED to get title' )
-          print( self.d.keys() )
-          self._rv = 0
-          self.__fails__.append( ('NO TITLE', self.vid) )
-        if x == '':
-          print( 'EMPTY title' )
-        self.o['long_name'] = x
 
     def get_physical_parameter(self):
         try:
@@ -137,17 +163,20 @@ class CMOR_Variable(object):
 
 l1 = []
 
+# dd/mm/YY H:M:S
+dt_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
 Header= {
     "Conventions": "CF-1.7 CMIP-6.5",
     "approx_interval": 30.0,
     "checksum": "",
     "cmor_version": "3.8.0",
-    "data_specs_version": "6.5.0.0",
+    "data_specs_version": "1.0a1",
     "generic_levels": "",
     "int_missing_value": "-999",
     "missing_value": "1e20",
-    "product": "model-output",
-    "table_date": None,
+    "product": "CMIP AR7 Fast Track Data Request",
+    "table_date": dt_string,
     "table_id": None,
   }
 
