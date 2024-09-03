@@ -3,6 +3,8 @@ A collection of scripts for the CMIP7 fast track data request.
 
 THESE SCRIPTS ARE PROVIDED TO ILLUSTRATE IMPLEMENTATION OF BASIC TASKS. THERE IS NO ONGOING SUPPORT.
 
+`cmor_tables.py` : Writes out a set of CMOR Tables (V3.8) in JSON files.
+
 `request_read.py` : Reads the full contents of the public bases and dumps contents to a JSON file, or reads in the JSON file. JSON file format mirrors Air Table format closely and is not human friendly. Links between records are indicated by opaque record identifiers. This JSON file is approximately 218k records at present. To read from Air Table a personal access token is needed. This requires an account, and availability is limited to participants Data Request management.
 
 `request_classes.py` : Loads request contents into a set of classes for Tables and Records, and converts links between records to direct references. 
