@@ -95,16 +95,13 @@ class Table(Request):
           if n != None:
             self.name_dict[n] = rec
             ##
-            ## MESSY TEMPRORARY FIX TO GET MAPPING OF SYNCED RECORDS WORKING
-            ## BY AVOIDING NAME DUPLICATION IN THIS TABLE
+            ## GET MAPPING OF SYNCED RECORDS WORKING
             ##
-            if name not in ['ESM-BCV 1.3','Grids']:
+            if name in ['Variable','Physical Parameter']:
               self.record_by_name[n].add(rec)
-
 
     def by_name(self,name):
         return self.name_dict[name]
-
 
 
 def import_request():

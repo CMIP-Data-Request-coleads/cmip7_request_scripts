@@ -87,10 +87,24 @@ def load_json():
   
 
 if __name__ == "__main__":
+  import sys
 
+  FROMBASE = "base" in sys.argv
   if FROMBASE:
     lb = from_base()
   else:
     lb = load_json()
 
   tables = lb.tables
+
+  if "classes" in sys.argv:
+      oo = open( 'request_classes.py.template', 'w' )
+      ks = sorted( tables.keys() )
+      for k in ks:
+          if k not in ['Comment','ESM-BCV 1.3'] and k[:2]!= '__':
+            print( k )
+            d = tables[k]['description']
+            kk = k.title().replace(' ','')
+            oo.write( '\n## AUTO\nclass %s(Table):\n    """%s"""\n\n## END\n    def __init__(self):\n        pass\n\n' % (kk,d) )
+
+      oo.close()
