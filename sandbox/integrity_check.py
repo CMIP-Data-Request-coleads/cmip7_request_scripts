@@ -65,4 +65,21 @@ for base_name, tables in bases.items():
                     for uid in record_links:
                         assert uid in tables[linked_table_name]['records'], 'record id not found in linked table'
 
-# If we've got this far without errors, the integrity is ok.
+# If we've got this far without errors, the integrity of links is ok.
+
+# While we're here, check uniqueness of variable Compound Names
+check_base_tables = {
+    'Data Request Variables (Public)' : ['Variable'],
+    'Data Request Opportunities (Public)' : ['Variables']
+}
+for base_name in check_bases:
+    print(f'\nChecking uniqueness of Compound Name in base: {base_name}')
+    for table_name in check_base_tables[base_name]:
+        print(f'  Checking table: {table_name}')
+        table = bases[base_name][table_name]
+        nrec = len(table['records'])
+        names = [ record['Compound Name'] for record in table['records'].values() ]
+        print(f'    number of variables: {nrec}')
+        n = len(set(names))
+        print(f'    number of unique Compound Names: {n}')
+
