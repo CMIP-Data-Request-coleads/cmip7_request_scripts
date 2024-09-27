@@ -72,7 +72,7 @@ check_base_tables = {
     'Data Request Variables (Public)' : ['Variable'],
     'Data Request Opportunities (Public)' : ['Variables']
 }
-for base_name in check_bases:
+for base_name in check_base_tables:
     print(f'\nChecking uniqueness of Compound Name in base: {base_name}')
     for table_name in check_base_tables[base_name]:
         print(f'  Checking table: {table_name}')
